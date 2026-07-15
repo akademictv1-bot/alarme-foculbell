@@ -80,6 +80,13 @@ function SplashGate({ children }: { children: React.ReactNode }) {
               headerShown: false,
             }}
           />
+          <Stack.Screen
+            name="snooze-reason/[id]"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
         </Stack>
         <StatusBar style={accent === 'white' ? 'dark' : 'light'} />
       </ThemeProvider>

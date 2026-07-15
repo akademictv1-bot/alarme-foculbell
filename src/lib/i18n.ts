@@ -143,6 +143,9 @@ const translations: Record<Language, Record<string, string>> = {
     'reasonPlaceholder': 'Ex: Estava cansado, surgiu uma urgência...',
     'justIgnore': 'Apenas Ignorar',
     'saveReason': 'Salvar Motivo',
+    'snoozeReason': 'Por que estás a adiar?',
+    'snoozeReasonPlaceholder': 'Ex: Preciso de mais tempo, não estou preparado...',
+    'snoozeWithReason': 'Adiar com Motivo',
 
     'taskDetails': 'Detalhes da Tarefa',
     'completedStatus': 'Concluída',
@@ -380,6 +383,9 @@ const translations: Record<Language, Record<string, string>> = {
     'reasonPlaceholder': 'Ex: I was tired, an emergency came up...',
     'justIgnore': 'Just Ignore',
     'saveReason': 'Save Reason',
+    'snoozeReason': 'Why are you snoozing?',
+    'snoozeReasonPlaceholder': 'Ex: I need more time, I\'m not ready...',
+    'snoozeWithReason': 'Snooze with Reason',
 
     'taskDetails': 'Task Details',
     'completedStatus': 'Completed',

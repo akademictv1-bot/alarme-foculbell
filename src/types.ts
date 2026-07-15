@@ -25,6 +25,7 @@ export interface Task {
   reflectionHow?: string;
   reflectionWhy?: string;
   cancelReason?: string;
+  snoozeReason?: string;
 }
 
 export type Language = 'pt' | 'en';

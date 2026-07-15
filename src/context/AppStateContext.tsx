@@ -63,6 +63,7 @@ interface AppStateContextValue {
   handleAddNewTask: (data: Omit<Task, 'id' | 'completed'>) => Promise<void>;
   handleAlarmComplete: () => void;
   handleAlarmSnooze: () => void;
+  handleAlarmSnoozeWithReason: (taskId: string, reason: string) => Promise<void>;
   handleAlarmIgnore: () => void;
   handleSaveCancelReason: (reason: string) => void;
   handleSaveConclusion: (how: string, why: string) => void;
@@ -247,25 +248,32 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     setTimeout(() => router.push(`/conclusion/${activeAlarmTask.id}`), 100);
   }, [activeAlarmTask]);
 
-  const handleAlarmSnooze = useCallback(async () => {
+  const handleAlarmSnooze = useCallback(() => {
     if (!activeAlarmTask) return;
     stopAlarmSound();
-    recentlyTriggeredRef.current.delete(activeAlarmTask.id);
-    const [hours, mins] = activeAlarmTask.time.split(':').map(Number);
+    router.push(`/snooze-reason/${activeAlarmTask.id}`);
+  }, [activeAlarmTask]);
+
+  const handleAlarmSnoozeWithReason = useCallback(async (taskId: string, reason: string) => {
+    const task = tasksRef.current.find((t) => t.id === taskId);
+    if (!task) return;
+    stopAlarmSound();
+    recentlyTriggeredRef.current.delete(taskId);
+    const [hours, mins] = task.time.split(':').map(Number);
     let newMins = mins + 10;
     let newHours = hours;
     if (newMins >= 60) { newMins -= 60; newHours = (newHours + 1) % 24; }
     const fmt = `${newHours.toString().padStart(2, '0')}:${newMins.toString().padStart(2, '0')}`;
-    const updated = { ...activeAlarmTask, time: fmt };
-    cancelTaskNotification(activeAlarmTask.notificationId || '');
+    const updated = { ...task, time: fmt, snoozeReason: reason };
+    cancelTaskNotification(task.notificationId || '');
     const soundId = profile?.settings?.alarmSound || 'urgent';
     const customSoundUri = profile?.settings?.customAlarmUri;
     const newNotifId = await scheduleTaskNotification(updated, soundId, customSoundUri);
     const final = newNotifId ? { ...updated, notificationId: newNotifId } : updated;
-    setTasks((prev) => prev.map((t) => (t.id === activeAlarmTask.id ? final : t)));
+    setTasks((prev) => prev.map((t) => (t.id === taskId ? final : t)));
     setActiveAlarmTask(null);
     setTimeout(() => router.dismissAll(), 100);
-  }, [activeAlarmTask, profile]);
+  }, [profile]);
 
   const handleAlarmIgnore = useCallback(() => {
     if (!activeAlarmTask) return;
@@ -318,7 +326,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     lang, accent, colors, streakCount,
     persistProfile, persistTasks,
     handleToggleComplete, handleDeleteTask, handleAddNewTask,
-    handleAlarmComplete, handleAlarmSnooze, handleAlarmIgnore,
+    handleAlarmComplete, handleAlarmSnooze, handleAlarmSnoozeWithReason, handleAlarmIgnore,
     handleSaveCancelReason, handleSaveConclusion,
     handleOnboardingComplete,
     setActiveAlarmTask, setConclusionTask, setCancelReasonTask,

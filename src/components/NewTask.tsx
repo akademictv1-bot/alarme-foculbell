@@ -108,14 +108,14 @@ export default function NewTask({ onClose, onSave }: NewTaskProps) {
                           return (
                             <Pressable key={p} onPress={() => setPriority(p)}
                               style={[styles.prioItem, { backgroundColor: colors.surface, borderColor: colors.border }, sel && { backgroundColor: `${pc.hex}1A`, borderColor: `${pc.hex}4D` }]}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: pc.hex }} />
-                                <View>
-                                  <Text style={{ fontSize: 15, fontWeight: '600', color: sel ? colors.text : colors.textMuted }}>{pLabel}</Text>
-                                  <Text style={{ fontSize: 11, color: sel ? colors.textSecondary : colors.textMuted, opacity: 0.7 }}>{pc.desc}</Text>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: pc.hex }} />
+                                <View style={{ flexShrink: 1 }}>
+                                  <Text style={{ fontSize: 14, fontWeight: '600', color: sel ? colors.text : colors.textMuted }} numberOfLines={1}>{pLabel}</Text>
+                                  <Text style={{ fontSize: 10, color: sel ? colors.textSecondary : colors.textMuted, opacity: 0.7 }} numberOfLines={1}>{pc.desc}</Text>
                                 </View>
                               </View>
-                              {sel && <Ionicons name="checkmark" size={14} color={colors.text} />}
+                              {sel && <Ionicons name="checkmark" size={12} color={colors.text} />}
                             </Pressable>
                           );
                         })}

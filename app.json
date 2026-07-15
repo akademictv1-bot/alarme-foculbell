@@ -1,17 +1,42 @@
 {
   "expo": {
-    "name": "focusbell",
+    "name": "FocusBell",
     "slug": "focusbell",
     "version": "1.0.0",
+    "scheme": "focusbell",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "experiments": {
+      "reactCompiler": true
+    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.focusbell.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio",
+          "remote-notification",
+          "fetch"
+        ],
+        "UNNotificationPermissionOptions": [
+          "alert",
+          "badge",
+          "sound"
+        ]
+      }
     },
     "android": {
+      "package": "com.focusbell.app",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#09090b",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -19,7 +44,39 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "bundler": "metro",
+      "output": "single",
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./assets/sounds/default.wav",
+            "./assets/sounds/urgent.wav",
+            "./assets/sounds/emergency.wav",
+            "./assets/sounds/sharp.wav",
+            "./assets/sounds/pulse.wav"
+          ],
+          "icon": "./assets/icon.png",
+          "color": "#09090b",
+          "defaultChannel": "alarm"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#09090b"
+        }
+      ],
+      "expo-router",
+      "expo-status-bar",
+      "expo-audio",
+      "expo-asset"
+    ]
   }
 }

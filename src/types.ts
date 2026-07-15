@@ -1,5 +1,11 @@
 export type PriorityType = 'Alta' | 'Média' | 'Baixa';
 
+export const PRIORITY_COLORS: Record<PriorityType, { hex: string; label: string; desc: string }> = {
+  Alta:   { hex: '#ef4444', label: 'Vermelho', desc: 'Urgência, ação crítica, foco total' },
+  Média:  { hex: '#f59e0b', label: 'Âmbar', desc: 'Atenção, preparação, equilíbrio' },
+  Baixa:  { hex: '#22c55e', label: 'Verde', desc: 'Tranquilidade, progresso, leveza' },
+};
+
 export interface Task {
   id: string;
   title: string;
@@ -8,6 +14,7 @@ export interface Task {
   time: string;
   category: string;
   priority: PriorityType;
+  color?: string;
   repetition: string;
   reminder: string;
   completed: boolean;

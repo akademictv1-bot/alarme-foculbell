@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Task } from '../types';
+import { Task, PRIORITY_COLORS } from '../types';
 import { useThemeColors } from '../lib/ThemeContext';
 import { useT } from '../lib/LanguageContext';
 import TaskDetailModal from './TaskDetailModal';
@@ -31,11 +31,7 @@ export default function TasksListFull({ tasks, onToggleComplete, onDeleteTask, o
     return true;
   });
 
-  const prioColor = (prio: Task['priority']) => {
-    if (prio === 'Alta') return { bg: 'rgba(244,63,94,0.1)', text: '#fb7185', border: 'rgba(244,63,94,0.1)' };
-    if (prio === 'Média') return { bg: 'rgba(245,158,11,0.1)', text: '#fbbf24', border: 'rgba(245,158,11,0.1)' };
-    return { bg: 'rgba(16,185,129,0.1)', text: '#34d399', border: 'rgba(16,185,129,0.1)' };
-  };
+  const getTaskColor = (task: Task) => task.color || PRIORITY_COLORS[task.priority].hex;
 
   const filters: FilterType[] = ['Todas', 'Pendentes', 'Concluídas'];
 
@@ -91,19 +87,23 @@ export default function TasksListFull({ tasks, onToggleComplete, onDeleteTask, o
             <View style={{ gap: 10 }}>
               {filteredTasks.map((task) => {
                 const done = task.completed;
-                const pc = prioColor(task.priority);
+                const tc = getTaskColor(task);
                 return (
-                  <View key={task.id} style={[styles.taskItem, { backgroundColor: colors.surface, borderColor: colors.border }, done && { opacity: 0.4 }]}>
-                    <Pressable onPress={() => setDetailTask(task)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                  <View key={task.id} style={[styles.taskItem, { backgroundColor: colors.surface, borderColor: colors.border, padding: 0, overflow: 'hidden' }, done && { opacity: 0.4 }]}>
+                    <View style={{ width: 4, backgroundColor: done ? colors.borderLight : tc }} />
+                    <Pressable onPress={() => setDetailTask(task)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, paddingLeft: 10 }}>
                       <Pressable onPress={() => onToggleComplete(task.id)}
-                        style={[styles.checkbox, done ? { backgroundColor: colors.accentBg, borderColor: colors.accentBg } : { borderColor: colors.borderLight }]}>
-                        {done && <Ionicons name="checkmark" size={16} color={colors.accentText} />}
+                        style={[styles.checkbox, done ? { backgroundColor: tc, borderColor: tc } : { borderColor: tc }]}>
+                        {done && <Ionicons name="checkmark" size={16} color="#fff" />}
                       </Pressable>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.taskTitle, { color: colors.text }, done && { textDecorationLine: 'line-through', color: colors.textMuted }]} numberOfLines={1}>{task.title}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
                           <Text style={{ fontSize: 14, color: colors.textMuted }}>{task.time} • {task.date.split('-').reverse().join('/')}</Text>
-                          <Text style={{ fontSize: 13, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4, backgroundColor: pc.bg, color: pc.text, borderWidth: 1, borderColor: pc.border, overflow: 'hidden' }}>{task.priority}</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: tc }} />
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: tc }}>{task.priority}</Text>
+                          </View>
                           <Text style={{ fontSize: 13, backgroundColor: colors.surfaceLight, color: colors.textMuted, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4, borderWidth: 1, borderColor: colors.borderLight, overflow: 'hidden' }}>{task.category}</Text>
                         </View>
                         {task.description ? (
@@ -111,7 +111,7 @@ export default function TasksListFull({ tasks, onToggleComplete, onDeleteTask, o
                         ) : null}
                       </View>
                     </Pressable>
-                    <View style={{ flexDirection: 'row', gap: 4 }}>
+                    <View style={{ flexDirection: 'row', gap: 4, paddingRight: 8, alignItems: 'center' }}>
                       <Pressable onPress={() => setDetailTask(task)} style={styles.actionBtn}>
                         <Ionicons name="eye-outline" size={16} color={colors.accentText} />
                       </Pressable>

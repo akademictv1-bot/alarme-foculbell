@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Task, PriorityType } from '../types';
+import { Task, PriorityType, PRIORITY_COLORS } from '../types';
 import { useThemeColors } from '../lib/ThemeContext';
 import { useT } from '../lib/LanguageContext';
 
@@ -19,11 +19,7 @@ const categories = [
   { name: 'Pessoal', color: 'rgba(156,163,175,0.1)' },
 ];
 
-const priorities: { type: PriorityType; color: string }[] = [
-  { type: 'Alta', color: '#f43f5e' },
-  { type: 'Média', color: '#f59e0b' },
-  { type: 'Baixa', color: '#10b981' },
-];
+const priorities: PriorityType[] = ['Alta', 'Média', 'Baixa'];
 
 export default function NewTask({ onClose, onSave }: NewTaskProps) {
   const colors = useThemeColors();
@@ -46,6 +42,7 @@ export default function NewTask({ onClose, onSave }: NewTaskProps) {
       time,
       category,
       priority,
+      color: PRIORITY_COLORS[priority].hex,
       repetition,
       reminder,
     });
@@ -105,14 +102,18 @@ export default function NewTask({ onClose, onSave }: NewTaskProps) {
                     <Text style={[styles.label, { color: colors.textMuted }]}><Ionicons name="flag-outline" size={14} color={colors.text} /> {$('priority')}</Text>
                       <View style={{ gap: 8 }}>
                         {priorities.map((p) => {
-                          const sel = priority === p.type;
-                          const pLabel = p.type === 'Alta' ? $('high') : p.type === 'Média' ? $('medium') : $('low');
+                          const sel = priority === p;
+                          const pc = PRIORITY_COLORS[p];
+                          const pLabel = p === 'Alta' ? $('high') : p === 'Média' ? $('medium') : $('low');
                           return (
-                            <Pressable key={p.type} onPress={() => setPriority(p.type)}
-                              style={[styles.prioItem, { backgroundColor: colors.surface, borderColor: colors.border }, sel && { backgroundColor: `${p.color}1A`, borderColor: `${p.color}26` }]}>  
-                              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: p.color }} />
-                                <Text style={{ fontSize: 15, fontWeight: '500', color: sel ? colors.text : colors.textMuted }}>{pLabel}</Text>
+                            <Pressable key={p} onPress={() => setPriority(p)}
+                              style={[styles.prioItem, { backgroundColor: colors.surface, borderColor: colors.border }, sel && { backgroundColor: `${pc.hex}1A`, borderColor: `${pc.hex}4D` }]}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: pc.hex }} />
+                                <View>
+                                  <Text style={{ fontSize: 15, fontWeight: '600', color: sel ? colors.text : colors.textMuted }}>{pLabel}</Text>
+                                  <Text style={{ fontSize: 11, color: sel ? colors.textSecondary : colors.textMuted, opacity: 0.7 }}>{pc.desc}</Text>
+                                </View>
                               </View>
                               {sel && <Ionicons name="checkmark" size={14} color={colors.text} />}
                             </Pressable>

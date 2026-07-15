@@ -1,6 +1,6 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Task } from '../types';
+import { Task, PRIORITY_COLORS } from '../types';
 import { useThemeColors } from '../lib/ThemeContext';
 import { useT } from '../lib/LanguageContext';
 
@@ -13,9 +13,8 @@ export default function TaskDetailModal({ task, onClose }: TaskDetailModalProps)
   const colors = useThemeColors();
   const $ = useT();
   const done = task.completed;
-  const pc = task.priority === 'Alta' ? { bg: 'rgba(244,63,94,0.1)', text: '#fb7185', border: 'rgba(244,63,94,0.1)' }
-    : task.priority === 'Média' ? { bg: 'rgba(245,158,11,0.1)', text: '#fbbf24', border: 'rgba(245,158,11,0.1)' }
-    : { bg: 'rgba(16,185,129,0.1)', text: '#34d399', border: 'rgba(16,185,129,0.1)' };
+  const tc = task.color || PRIORITY_COLORS[task.priority].hex;
+  const pc = { bg: `${tc}18`, text: tc, border: `${tc}30` };
 
   return (
     <View style={styles.overlay}>

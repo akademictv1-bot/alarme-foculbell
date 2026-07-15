@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, Text, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Task, UserProfile } from '../types';
+import { Task, UserProfile, PRIORITY_COLORS } from '../types';
 import { useThemeColors } from '../lib/ThemeContext';
 import { useT } from '../lib/LanguageContext';
 import { COUNTRIES } from '../lib/i18n';
@@ -46,11 +46,7 @@ export default function Dashboard({
   const pct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const nextFocusTask = pendingTasks[0] || null;
 
-  const getPrioColor = (prio: Task['priority']) => {
-    if (prio === 'Alta') return '#f43f5e';
-    if (prio === 'Média') return '#f59e0b';
-    return '#10b981';
-  };
+  const getTaskColor = (task: Task) => task.color || PRIORITY_COLORS[task.priority].hex;
 
   const msg = () => {
     if (totalCount === 0) return $('msgStartDay');
@@ -114,23 +110,25 @@ export default function Dashboard({
               {nextFocusTask && <Text style={[s.badge, { backgroundColor: colors.accentLight, borderColor: colors.accentBorder, borderWidth: 1 }, { color: colors.accentText }]}>{$('start45mSession')}</Text>}
             </View>
             {nextFocusTask ? (
-              <View style={[s.nextCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <View style={[s.indicator, { backgroundColor: colors.accentBg }]} />
-                <View style={{ padding: 20, paddingLeft: 24 }}>
-                  <View style={{ flexDirection: 'row', gap: 8 }}>
-                    <Text style={[s.pill, { backgroundColor: colors.accentLight, borderColor: colors.accentBorder, borderWidth: 1 }, { color: colors.accentText }]}>{nextFocusTask.category}</Text>
-                    <Text style={[s.pill, nextFocusTask.priority === 'Alta' ? s.priHigh : nextFocusTask.priority === 'Média' ? s.priMid : s.priLow]}>{nextFocusTask.priority}</Text>
+              <View style={[s.summaryCard, { backgroundColor: colors.surface, borderColor: colors.border, padding: 0, overflow: 'hidden' }]}>
+                <View style={{ flexDirection: 'row', flex: 1 }}>
+                  <View style={{ width: 5, backgroundColor: getTaskColor(nextFocusTask) }} />
+                  <View style={{ flex: 1, padding: 20, gap: 10 }}>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                      <Text style={[s.pill, { backgroundColor: colors.accentLight, borderColor: colors.accentBorder, borderWidth: 1 }, { color: colors.accentText }]}>{nextFocusTask.category}</Text>
+                      <Text style={[s.pill, nextFocusTask.priority === 'Alta' ? s.priHigh : nextFocusTask.priority === 'Média' ? s.priMid : s.priLow]}>{nextFocusTask.priority}</Text>
+                    </View>
+                    <Text style={[s.nextTitle, { color: colors.text }]}>{nextFocusTask.title}</Text>
+                    {nextFocusTask.description && <Text style={[s.nextDesc, { color: colors.textMuted }]} numberOfLines={2}>{nextFocusTask.description}</Text>}
+                    <Text style={[s.nextTime, { color: colors.textMuted }]}><Ionicons name="time-outline" size={16} color={colors.textMuted} /> {$('scheduledFor')} {nextFocusTask.time}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 14, marginTop: 4 }}>
+                      <Text style={{ fontSize: 15, color: colors.textMuted, fontStyle: 'italic' }}>{$('isYourMindReady')}</Text>
+                      <Pressable onPress={() => onTriggerAlarm(nextFocusTask)} style={[s.startBtn, { backgroundColor: colors.accentBg }]}>
+                        <Ionicons name="play" size={16} color={colors.accentText} />
+                        <Text style={[s.startBtnText, { color: colors.accentText }]}>{$('startSession')}</Text>
+                      </Pressable>
+                    </View>
                   </View>
-                  <Text style={[s.nextTitle, { color: colors.text }]}>{nextFocusTask.title}</Text>
-                  {nextFocusTask.description && <Text style={[s.nextDesc, { color: colors.textMuted }]} numberOfLines={2}>{nextFocusTask.description}</Text>}
-                  <Text style={[s.nextTime, { color: colors.textMuted }]}><Ionicons name="time-outline" size={16} color={colors.textMuted} /> {$('scheduledFor')} {nextFocusTask.time}</Text>
-                </View>
-                <View style={[s.nextFooter, { borderTopColor: colors.border }]}>
-                  <Text style={{ fontSize: 15, color: colors.textMuted, fontStyle: 'italic' }}>{$('isYourMindReady')}</Text>
-                  <Pressable onPress={() => onTriggerAlarm(nextFocusTask)} style={[s.startBtn, { backgroundColor: colors.accentBg }]}>
-                    <Ionicons name="play" size={16} color={colors.accentText} />
-                    <Text style={[s.startBtnText, { color: colors.accentText }]}>{$('startSession')}</Text>
-                  </Pressable>
                 </View>
               </View>
             ) : (
@@ -157,22 +155,24 @@ export default function Dashboard({
             <View style={{ gap: 8 }}>
               {todayTasks.map((t) => {
                 const done = t.completed;
+                const tc = getTaskColor(t);
                 return (
-                  <View key={t.id} style={[s.taskItem, { backgroundColor: colors.surface, borderColor: colors.border }, done && { opacity: 0.4 }]}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+                  <View key={t.id} style={[s.taskItem, { backgroundColor: colors.surface, borderColor: colors.border, flexDirection: 'row', overflow: 'hidden' }, done && { opacity: 0.4 }]}>
+                    <View style={{ width: 4, backgroundColor: done ? colors.borderLight : tc }} />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, padding: 12, paddingLeft: 10 }}>
                       <Pressable onPress={() => onToggleComplete(t.id)}
-                        style={[s.checkbox, done ? { backgroundColor: colors.accentBg, borderColor: colors.accentBg } : { borderColor: colors.borderLight }]}>
-                        {done && <Ionicons name="checkmark" size={16} color={colors.accentText} />}
+                        style={[s.checkbox, done ? { backgroundColor: tc, borderColor: tc } : { borderColor: tc }]}>
+                        {done && <Ionicons name="checkmark" size={16} color="#fff" />}
                       </Pressable>
                       <View style={{ flex: 1 }}>
                         <Text style={[s.taskTitle, { color: colors.text }, done && { textDecorationLine: 'line-through', color: colors.textMuted }]} numberOfLines={1}>{t.title}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 }}>
-                          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: getPrioColor(t.priority) }} />
+                          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: tc }} />
                           <Text style={{ fontSize: 14, color: colors.textMuted }}>{t.category} • {t.time}</Text>
                         </View>
                       </View>
                     </View>
-                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                    <View style={{ flexDirection: 'row', gap: 4, paddingRight: 8, alignItems: 'center' }}>
                       {!done && <Pressable onPress={() => onTriggerAlarm(t)} style={s.taskAction}><Ionicons name="play" size={16} color={colors.textMuted} /></Pressable>}
                       <Pressable onPress={() => onDeleteTask(t.id)} style={s.taskAction}><Ionicons name="trash-outline" size={16} color={colors.textMuted} /></Pressable>
                     </View>
@@ -226,8 +226,7 @@ const s = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   sectionTitle: { fontSize: 15, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
   badge: { fontSize: 13, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
-  nextCard: { borderWidth: 1, borderRadius: 16, overflow: 'hidden' },
-  indicator: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 4 },
+
   pill: { fontSize: 13, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999, fontWeight: '500', overflow: 'hidden' },
   priHigh: { backgroundColor: 'rgba(244,63,94,0.1)', color: '#fb7185', borderColor: 'rgba(244,63,94,0.1)' },
   priMid: { backgroundColor: 'rgba(245,158,11,0.1)', color: '#fbbf24', borderColor: 'rgba(245,158,11,0.1)' },

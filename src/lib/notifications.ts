@@ -84,7 +84,7 @@ async function setupAndroidChannels(mod: typeof import('expo-notifications')) {
     importance: mod.AndroidImportance.HIGH,
     vibrationPattern: [0, 300, 100, 300],
     sound: 'default.wav',
-    bypassDnd: false,
+    bypassDnd: true,
     lockscreenVisibility: mod.AndroidNotificationVisibility.PUBLIC,
   });
 }
@@ -153,14 +153,6 @@ export async function scheduleMorningReminder(): Promise<string | undefined> {
   const mod = await getNotifications();
   if (!mod) return undefined;
 
-  const now = new Date();
-  const target = new Date(now);
-  target.setHours(8, 0, 0, 0);
-  if (target.getTime() <= now.getTime()) {
-    target.setDate(target.getDate() + 1);
-  }
-  const secondsUntilTarget = Math.ceil((target.getTime() - now.getTime()) / 1000);
-
   try {
     const id = await mod.scheduleNotificationAsync({
       content: {
@@ -172,9 +164,9 @@ export async function scheduleMorningReminder(): Promise<string | undefined> {
         ...(Platform.OS === 'android' ? { channelId: 'morning_reminder' } : {}),
       },
       trigger: {
-        type: mod.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: secondsUntilTarget,
-        repeats: true,
+        type: mod.SchedulableTriggerInputTypes.DAILY,
+        hour: 6,
+        minute: 0,
       },
     });
     return id;

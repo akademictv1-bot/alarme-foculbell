@@ -9,7 +9,7 @@ import { LanguageProvider } from '../src/lib/LanguageContext';
 import { ThemeProvider } from '../src/lib/ThemeContext';
 import SplashScreen from '../src/components/SplashScreen';
 
-function SplashGate({ children }: { children: React.ReactNode }) {
+function SplashGate() {
   const { initialized, profile, accent, lang } = useAppState();
   const [showSplash, setShowSplash] = useState(true);
 

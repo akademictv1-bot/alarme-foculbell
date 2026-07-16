@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef, useMemo, createContext, use, ReactNode } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
 import { router } from 'expo-router';
 import { Task, UserProfile, Language } from '../types';
 import { Accent, ThemeColors, getThemeColors } from '../lib/theme';
@@ -68,6 +67,7 @@ interface AppStateContextValue {
   handleSaveCancelReason: (reason: string) => void;
   handleSaveConclusion: (how: string, why: string) => void;
   handleOnboardingComplete: (completedProfile: UserProfile) => void;
+  blockReTrigger: (taskId: string) => void;
   setActiveAlarmTask: (task: Task | null) => void;
   setConclusionTask: (task: Task | null) => void;
   setCancelReasonTask: (task: Task | null) => void;
@@ -126,6 +126,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!initialized) return;
 
+    let mounted = true;
     const setupListeners = async () => {
       const [removeNotifListener, removeResponseListener] = await Promise.all([
         addNotificationReceivedListener((notification: any) => {
@@ -133,6 +134,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
           if (data?.type === 'task' && data?.taskId) {
             const found = tasksRef.current.find((t) => t.id === data.taskId);
             if (found && !found.completed) {
+              recentlyTriggeredRef.current.add(data.taskId);
               setActiveAlarmTask(found);
               router.push(`/alarm/${data.taskId}`);
             }
@@ -143,28 +145,31 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
           if (data?.type === 'task' && data?.taskId) {
             const found = tasksRef.current.find((t) => t.id === data.taskId);
             if (found && !found.completed) {
+              recentlyTriggeredRef.current.add(data.taskId);
               setActiveAlarmTask(found);
               router.push(`/alarm/${data.taskId}`);
             }
           }
         }),
       ]);
-      return () => { removeNotifListener(); removeResponseListener(); };
+      return () => { if (mounted) { removeNotifListener(); removeResponseListener(); } };
     };
 
     let removeListeners: (() => void) | null = null;
     setupListeners().then((cleanup) => { removeListeners = cleanup; });
 
-    return () => { removeListeners?.(); };
+    return () => { mounted = false; removeListeners?.(); };
   }, [initialized]);
 
   const recentlyTriggeredRef = useRef<Set<string>>(new Set());
+  const activeAlarmTaskRef = useRef(activeAlarmTask);
+  activeAlarmTaskRef.current = activeAlarmTask;
 
   useEffect(() => {
     if (!initialized) return;
 
     const timer = setInterval(() => {
-      if (activeAlarmTask) return;
+      if (activeAlarmTaskRef.current) return;
       if (!tasksRef.current.length) return;
 
       const now = new Date();
@@ -191,9 +196,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
     return () => {
       clearInterval(timer);
-      recentlyTriggeredRef.current.clear();
     };
-  }, [initialized, activeAlarmTask]);
+  }, [initialized]);
 
   const persistProfile = useCallback((newProfile: UserProfile) => {
     setProfile(newProfile);
@@ -217,6 +221,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const handleToggleComplete = useCallback((taskId: string) => {
     const task = tasks.find((t) => t.id === taskId);
     if (task && !task.completed) {
+      recentlyTriggeredRef.current.add(taskId);
       setConclusionTask(task);
       router.push(`/conclusion/${taskId}`);
     }
@@ -242,10 +247,12 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   const handleAlarmComplete = useCallback(() => {
     if (!activeAlarmTask) return;
+    const taskId = activeAlarmTask.id;
     stopAlarmSound();
+    recentlyTriggeredRef.current.add(taskId);
     setConclusionTask(activeAlarmTask);
     setActiveAlarmTask(null);
-    setTimeout(() => router.push(`/conclusion/${activeAlarmTask.id}`), 100);
+    setTimeout(() => router.push(`/conclusion/${taskId}`), 100);
   }, [activeAlarmTask]);
 
   const handleAlarmSnooze = useCallback(() => {
@@ -277,11 +284,17 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   const handleAlarmIgnore = useCallback(() => {
     if (!activeAlarmTask) return;
+    const taskId = activeAlarmTask.id;
     stopAlarmSound();
+    recentlyTriggeredRef.current.add(taskId);
     setCancelReasonTask(activeAlarmTask);
     setActiveAlarmTask(null);
-    setTimeout(() => router.push(`/cancel-reason/${activeAlarmTask.id}`), 100);
+    setTimeout(() => router.push(`/cancel-reason/${taskId}`), 100);
   }, [activeAlarmTask]);
+
+  const blockReTrigger = useCallback((taskId: string) => {
+    recentlyTriggeredRef.current.add(taskId);
+  }, []);
 
   const handleSaveCancelReason = useCallback((reason: string) => {
     if (!cancelReasonTask) return;
@@ -329,6 +342,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     handleAlarmComplete, handleAlarmSnooze, handleAlarmSnoozeWithReason, handleAlarmIgnore,
     handleSaveCancelReason, handleSaveConclusion,
     handleOnboardingComplete,
+    blockReTrigger,
     setActiveAlarmTask, setConclusionTask, setCancelReasonTask,
   };
 

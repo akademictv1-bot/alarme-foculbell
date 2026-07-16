@@ -11,10 +11,12 @@ export default function PerfilScreen() {
     handleToggleComplete,
   } = useAppState();
 
+  if (!profile) return null;
+
   return (
     <View style={[{ flex: 1, backgroundColor: colors.bg, paddingTop: insets.top }]}>
       <ProfileView
-        profile={profile!}
+        profile={profile}
         tasks={tasks}
         onUpdateProfile={persistProfile}
         onQuickCompleteTask={handleToggleComplete}

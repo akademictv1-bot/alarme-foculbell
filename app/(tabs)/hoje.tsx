@@ -13,10 +13,12 @@ export default function HojeScreen() {
     handleDeleteTask, setActiveAlarmTask,
   } = useAppState();
 
+  if (!profile) return null;
+
   return (
     <View style={[{ flex: 1, backgroundColor: colors.bg }]}>
       <Dashboard
-        profile={profile!}
+        profile={profile}
         tasks={tasks}
         onToggleComplete={handleToggleComplete}
         onDeleteTask={handleDeleteTask}

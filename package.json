@@ -30,9 +30,11 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.14",
+    "patch-package": "^8.0.1",
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "start": "EXPO_ROUTER_APP_ROOT=./app expo start",
     "android": "EXPO_ROUTER_APP_ROOT=./app expo start --android",
     "ios": "EXPO_ROUTER_APP_ROOT=./app expo start --ios",

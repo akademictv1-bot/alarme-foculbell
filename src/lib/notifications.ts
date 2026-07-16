@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import { Task } from '../types';
 
 const SOUND_FILE_MAP: Record<string, string> = {
@@ -10,8 +11,11 @@ const SOUND_FILE_MAP: Record<string, string> = {
   custom:    'default.wav',
 };
 
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
+
 let _initDone = false;
 async function getNotifications() {
+  if (isExpoGo) return null;
   try {
     const mod: typeof import('expo-notifications') = await import('expo-notifications');
     if (!_initDone && mod.setNotificationHandler) {

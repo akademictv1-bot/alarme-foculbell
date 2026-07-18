@@ -19,7 +19,7 @@ function getAlarmAsset(soundId: string): { uri: string } | number {
       return require('../../assets/sounds/pulse.wav');
     case 'default':
     default:
-      return require('../../assets/sounds/default.wav');
+      return require('../../assets/sounds/standard.wav');
   }
 }
 

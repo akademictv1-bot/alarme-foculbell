@@ -23,9 +23,15 @@
         "UIBackgroundModes": [
           "audio",
           "remote-notification",
+          "fetch",
+          "audio",
+          "remote-notification",
           "fetch"
         ],
         "UNNotificationPermissionOptions": [
+          "alert",
+          "badge",
+          "sound",
           "alert",
           "badge",
           "sound"
@@ -41,7 +47,17 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -54,7 +70,7 @@
         "expo-notifications",
         {
           "sounds": [
-            "./assets/sounds/default.wav",
+            "./assets/sounds/standard.wav",
             "./assets/sounds/urgent.wav",
             "./assets/sounds/emergency.wav",
             "./assets/sounds/sharp.wav",
@@ -77,6 +93,18 @@
       "expo-status-bar",
       "expo-audio",
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7659fec2-42bf-4f56-b975-a6cf5d21e83b"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7659fec2-42bf-4f56-b975-a6cf5d21e83b"
+    }
   }
 }

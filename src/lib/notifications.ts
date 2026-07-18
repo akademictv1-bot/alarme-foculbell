@@ -3,12 +3,12 @@ import Constants from 'expo-constants';
 import { Task } from '../types';
 
 const SOUND_FILE_MAP: Record<string, string> = {
-  default:   'default.wav',
+  default:   'standard.wav',
   urgent:    'urgent.wav',
   emergency: 'emergency.wav',
   sharp:     'sharp.wav',
   pulse:     'pulse.wav',
-  custom:    'default.wav',
+  custom:    'standard.wav',
 };
 
 const isExpoGo = Constants.executionEnvironment === 'storeClient';
@@ -87,7 +87,7 @@ async function setupAndroidChannels(mod: typeof import('expo-notifications')) {
     name: 'Lembrete Matinal FocusBell',
     importance: mod.AndroidImportance.HIGH,
     vibrationPattern: [0, 300, 100, 300],
-    sound: 'default.wav',
+    sound: 'standard.wav',
     bypassDnd: true,
     lockscreenVisibility: mod.AndroidNotificationVisibility.PUBLIC,
   });
@@ -162,7 +162,7 @@ export async function scheduleMorningReminder(): Promise<string | undefined> {
       content: {
         title: 'FocusBell — Bom dia! ☀️',
         body: 'O dia começou! Cria as tuas tarefas agora para não perderes o foco.',
-        sound: 'default.wav',
+        sound: 'standard.wav',
         priority: mod.AndroidNotificationPriority.HIGH,
         data: { type: 'morning' },
         ...(Platform.OS === 'android' ? { channelId: 'morning_reminder' } : {}),

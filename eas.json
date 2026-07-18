@@ -13,7 +13,7 @@
       "extends": "development",
       "ios": {
         "simulator": true,
-        "resourceClass": "m-medium"
+        "resourceClass": "medium"
       }
     },
     "preview": {
@@ -23,7 +23,7 @@
         "buildType": "apk"
       },
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "medium"
       }
     },
     "production": {
@@ -31,10 +31,10 @@
       "autoIncrement": true,
       "android": {
         "buildType": "app-bundle",
-        "resourceClass": "m-medium"
+        "resourceClass": "medium"
       },
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "medium"
       }
     }
   },
